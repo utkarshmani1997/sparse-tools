@@ -136,8 +136,8 @@ func TestSyncFile9(t *testing.T) {
 
 func testSyncFile(t *testing.T, layoutLocal, layoutRemote []FileInterval) {
     // Only log errors
-	log.LevelPush(log.LevelError)
-	defer log.LevelPop()
+	// log.LevelPush(log.LevelError)
+	// defer log.LevelPop()
     
     // Create test files
 	filesCleanup()
