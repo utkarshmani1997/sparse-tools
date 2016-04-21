@@ -15,7 +15,7 @@ const localhost = "127.0.0.1"
 var remoteAddr = TCPEndPoint{localhost, 5000}
 
 func TestSyncFile1(t *testing.T) {
-    // D H D => D D H
+	// D H D => D D H
 	layoutLocal := []FileInterval{
 		{SparseData, Interval{0, 1 * Blocks}},
 		{SparseHole, Interval{1 * Blocks, 2 * Blocks}},
@@ -30,7 +30,7 @@ func TestSyncFile1(t *testing.T) {
 }
 
 func TestSyncFile2(t *testing.T) {
-    // H D H  => D H H
+	// H D H  => D H H
 	layoutLocal := []FileInterval{
 		{SparseHole, Interval{0, 1 * Blocks}},
 		{SparseData, Interval{1 * Blocks, 2 * Blocks}},
@@ -45,7 +45,7 @@ func TestSyncFile2(t *testing.T) {
 }
 
 func TestSyncFile3(t *testing.T) {
-    // D H D => D D
+	// D H D => D D
 	layoutLocal := []FileInterval{
 		{SparseData, Interval{0, 1 * Blocks}},
 		{SparseHole, Interval{1 * Blocks, 2 * Blocks}},
@@ -59,7 +59,7 @@ func TestSyncFile3(t *testing.T) {
 }
 
 func TestSyncFile4(t *testing.T) {
-    // H D H  => D H
+	// H D H  => D H
 	layoutLocal := []FileInterval{
 		{SparseHole, Interval{0, 1 * Blocks}},
 		{SparseData, Interval{1 * Blocks, 2 * Blocks}},
@@ -73,7 +73,7 @@ func TestSyncFile4(t *testing.T) {
 }
 
 func TestSyncFile5(t *testing.T) {
-    // H D H  => H D
+	// H D H  => H D
 	layoutLocal := []FileInterval{
 		{SparseHole, Interval{0, 1 * Blocks}},
 		{SparseData, Interval{1 * Blocks, 2 * Blocks}},
@@ -87,7 +87,7 @@ func TestSyncFile5(t *testing.T) {
 }
 
 func TestSyncFile6(t *testing.T) {
-    // H D H  => D 
+	// H D H  => D
 	layoutLocal := []FileInterval{
 		{SparseHole, Interval{0, 1 * Blocks}},
 		{SparseData, Interval{1 * Blocks, 2 * Blocks}},
@@ -100,7 +100,7 @@ func TestSyncFile6(t *testing.T) {
 }
 
 func TestSyncFile7(t *testing.T) {
-    // H D H  => H 
+	// H D H  => H
 	layoutLocal := []FileInterval{
 		{SparseHole, Interval{0, 1 * Blocks}},
 		{SparseData, Interval{1 * Blocks, 2 * Blocks}},
@@ -113,7 +113,7 @@ func TestSyncFile7(t *testing.T) {
 }
 
 func TestSyncFile8(t *testing.T) {
-    // D H D => 
+	// D H D =>
 	layoutLocal := []FileInterval{
 		{SparseData, Interval{0, 1 * Blocks}},
 		{SparseHole, Interval{1 * Blocks, 2 * Blocks}},
@@ -124,7 +124,7 @@ func TestSyncFile8(t *testing.T) {
 }
 
 func TestSyncFile9(t *testing.T) {
-    // H D H  => 
+	// H D H  =>
 	layoutLocal := []FileInterval{
 		{SparseHole, Interval{0, 1 * Blocks}},
 		{SparseData, Interval{1 * Blocks, 2 * Blocks}},
@@ -134,24 +134,48 @@ func TestSyncFile9(t *testing.T) {
 	testSyncFile(t, layoutLocal, layoutRemote)
 }
 
-func testSyncFile(t *testing.T, layoutLocal, layoutRemote []FileInterval) {
-    // Only log errors
+func TestSyncHash1(t *testing.T) {
+	var hash1, hash2 []byte
+	{
+		layoutLocal := []FileInterval{
+			{SparseData, Interval{0, 1 * Blocks}},
+			{SparseHole, Interval{1 * Blocks, 2 * Blocks}},
+		}
+		layoutRemote := layoutLocal
+		hash1 = testSyncFile(t, layoutLocal, layoutRemote)
+	}
+	{
+
+		layoutLocal := []FileInterval{
+			{SparseData, Interval{0, 1 * Blocks}},
+			{SparseHole, Interval{1 * Blocks, 3 * Blocks}},
+		}
+		layoutRemote := layoutLocal
+		hash2 = testSyncFile(t, layoutLocal, layoutRemote)
+	}
+    if !isHashDifferent(hash1, hash2) {
+        t.Fatal("Files with same data content but different layouts should have unique hashes")
+    }
+}
+
+func testSyncFile(t *testing.T, layoutLocal, layoutRemote []FileInterval) (hashLocal []byte) {
+	// Only log errors
 	// log.LevelPush(log.LevelError)
 	// defer log.LevelPop()
-    
-    // Create test files
+
+	// Create test files
 	filesCleanup()
 	createTestSparseFile(localPath, layoutLocal)
 	if len(layoutRemote) > 0 {
-        // only create destination test file if layout is speciifed
+		// only create destination test file if layout is speciifed
 		createTestSparseFile(remotePath, layoutRemote)
 	}
 
-    // Sync
+	// Sync
 	go TestServer(remoteAddr)
-	err := SyncFile(localPath, remoteAddr, remotePath)
+	hashLocal, err := SyncFile(localPath, remoteAddr, remotePath)
 
-    // Verify
+	// Verify
 	if err != nil {
 		t.Fatal("sync error")
 	}
@@ -159,6 +183,7 @@ func testSyncFile(t *testing.T, layoutLocal, layoutRemote []FileInterval) {
 		t.Fatal("file content diverged")
 	}
 	filesCleanup()
+    return
 }
 
 func Benchmark_1G_InitFiles(b *testing.B) {
@@ -180,7 +205,7 @@ func Benchmark_1G_SendFiles(b *testing.B) {
 	defer log.LevelPop()
 
 	go TestServer(remoteAddr)
-	err := SyncFile(localPath, remoteAddr, remotePath)
+	err, _ := SyncFile(localPath, remoteAddr, remotePath)
 
 	if err != nil {
 		b.Fatal("sync error")
