@@ -160,8 +160,8 @@ func TestSyncHash1(t *testing.T) {
 
 func testSyncFile(t *testing.T, layoutLocal, layoutRemote []FileInterval) (hashLocal []byte) {
 	// Only log errors
-	// log.LevelPush(log.LevelError)
-	// defer log.LevelPop()
+	log.LevelPush(log.LevelError)
+	defer log.LevelPop()
 
 	// Create test files
 	filesCleanup()
@@ -205,7 +205,7 @@ func Benchmark_1G_SendFiles(b *testing.B) {
 	defer log.LevelPop()
 
 	go TestServer(remoteAddr)
-	err, _ := SyncFile(localPath, remoteAddr, remotePath)
+	_, err := SyncFile(localPath, remoteAddr, remotePath)
 
 	if err != nil {
 		b.Fatal("sync error")
