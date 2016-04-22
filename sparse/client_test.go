@@ -11,6 +11,7 @@ import (
 const localPath = "foo1.bar"
 const remotePath = "foo2.bar"
 const localhost = "127.0.0.1"
+const timeout = 5 //seconds
 
 var remoteAddr = TCPEndPoint{localhost, 5000}
 
@@ -172,8 +173,8 @@ func testSyncFile(t *testing.T, layoutLocal, layoutRemote []FileInterval) (hashL
 	}
 
 	// Sync
-	go TestServer(remoteAddr)
-	hashLocal, err := SyncFile(localPath, remoteAddr, remotePath)
+	go TestServer(remoteAddr, timeout)
+	hashLocal, err := SyncFile(localPath, remoteAddr, remotePath, timeout)
 
 	// Verify
 	if err != nil {
@@ -204,8 +205,8 @@ func Benchmark_1G_SendFiles(b *testing.B) {
 	log.LevelPush(log.LevelInfo)
 	defer log.LevelPop()
 
-	go TestServer(remoteAddr)
-	_, err := SyncFile(localPath, remoteAddr, remotePath)
+	go TestServer(remoteAddr, timeout)
+	_, err := SyncFile(localPath, remoteAddr, remotePath, timeout)
 
 	if err != nil {
 		b.Fatal("sync error")
