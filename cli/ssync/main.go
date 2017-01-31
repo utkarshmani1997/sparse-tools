@@ -2,10 +2,11 @@ package ssync
 
 import (
 	"flag"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/rancher/sparse-tools/sparse"
-	"github.com/rancher/sparse-tools/sparse/rest"
+	"github.com/openebs/sparse-tools/sparse"
+	"github.com/openebs/sparse-tools/sparse/rest"
 )
 
 const (
@@ -24,12 +25,15 @@ func Main() {
 	port := flag.String("port", "5000", "optional daemon port")
 	timeout := flag.Int("timeout", 120, "optional daemon/client timeout (seconds)")
 	host := flag.String("host", "", "remote host of <DstFile> (requires running daemon)")
+	hostIP := flag.String("hostIP", "", "")
 
 	flag.Parse()
 
 	if *verbose {
 		log.SetLevel(log.DebugLevel)
 	}
+
+	parts := strings.Split(*hostIP, ":")
 
 	args := flag.Args()
 	if *daemon {
@@ -39,7 +43,7 @@ func Main() {
 		}
 		dstPath := args[0]
 
-		err := rest.Server(*port, dstPath)
+		err := rest.Server(parts[0], *port, dstPath)
 		if err != nil {
 			log.Fatalf("Ssync server failed, err: %s", err)
 		}

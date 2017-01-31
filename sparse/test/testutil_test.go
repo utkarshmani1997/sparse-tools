@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
-	. "github.com/rancher/sparse-tools/sparse"
+	. "github.com/openebs/sparse-tools/sparse"
 )
 
 const batch = int64(32) // number of blocks for single read/write

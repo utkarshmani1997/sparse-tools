@@ -3,8 +3,8 @@ package test
 import (
 	"testing"
 
-	. "github.com/rancher/sparse-tools/sparse"
-	"github.com/rancher/sparse-tools/sparse/rest"
+	. "github.com/openebs/sparse-tools/sparse"
+	"github.com/openebs/sparse-tools/sparse/rest"
 )
 
 const (

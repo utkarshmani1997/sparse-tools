@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 
 	log "github.com/Sirupsen/logrus"
-	. "github.com/rancher/sparse-tools/sparse"
+	. "github.com/openebs/sparse-tools/sparse"
 )
 
 func tempFilePathDirectIo() string {

@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/rancher/sparse-tools/sparse"
+	"github.com/openebs/sparse-tools/sparse"
 )
 
 func (server *SyncServer) getQueryInterval(request *http.Request) (sparse.Interval, error) {

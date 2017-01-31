@@ -9,8 +9,8 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	. "github.com/rancher/sparse-tools/sparse"
-	"github.com/rancher/sparse-tools/sparse/rest"
+	. "github.com/openebs/sparse-tools/sparse"
+	"github.com/openebs/sparse-tools/sparse/rest"
 )
 
 const srcPrefix = "ssync-src"

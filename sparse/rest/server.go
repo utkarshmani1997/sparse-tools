@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/rancher/sparse-tools/sparse"
+	"github.com/openebs/sparse-tools/sparse"
 )
 
 type SyncServer struct {
@@ -14,11 +14,11 @@ type SyncServer struct {
 
 // TestServer daemon serves only one connection for each test then exits
 func TestServer(port string, filePath string, timeout int) {
-	Server(port, filePath)
+	Server("", port, filePath)
 }
 
-func Server(port string, filePath string) error {
+func Server(hostIP string, port string, filePath string) error {
 	log.Infof("Creating Ssync service")
 	router := NewRouter(&SyncServer{filePath: filePath})
-	return http.ListenAndServe(":"+port, router)
+	return http.ListenAndServe(hostIP+":"+port, router)
 }
