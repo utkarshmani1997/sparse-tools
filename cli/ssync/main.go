@@ -2,6 +2,8 @@ package ssync
 
 import (
 	"flag"
+	"net/http"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 
@@ -42,7 +44,9 @@ func Main() {
 
 		ops := &rest.SyncFileStub{}
 		err := rest.Server(*port, dstPath, ops)
-		if err != nil {
+		if err == http.ErrServerClosed {
+			log.Info("Ssync server: exit code 0")
+		} else if err != nil {
 			log.Fatalf("Ssync server failed, err: %s", err)
 		}
 	} else {
@@ -59,4 +63,5 @@ func Main() {
 		}
 		log.Info("Ssync client: exit code 0")
 	}
+	os.Exit(0)
 }
