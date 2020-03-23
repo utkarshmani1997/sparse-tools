@@ -2,6 +2,7 @@ package ssync
 
 import (
 	"flag"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -25,12 +26,15 @@ func Main() {
 	port := flag.String("port", "5000", "optional daemon port")
 	timeout := flag.Int("timeout", 120, "optional daemon/client timeout (seconds)")
 	host := flag.String("host", "", "remote host of <DstFile> (requires running daemon)")
+	hostIP := flag.String("hostIP", "", "")
 
 	flag.Parse()
 
 	if *verbose {
 		log.SetLevel(log.DebugLevel)
 	}
+
+	parts := strings.Split(*hostIP, ":")
 
 	args := flag.Args()
 	if *daemon {
