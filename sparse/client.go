@@ -224,7 +224,8 @@ func (client *syncClient) openServer() error {
 		return fmt.Errorf("open failed, err: %s", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("resp.StatusCode(%d) != http.StatusOK", resp.StatusCode)
+		content, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("resp.StatusCode(%d) != http.StatusOK, resp: %s", resp.StatusCode, content)
 	}
 	resp.Body.Close()
 
@@ -265,7 +266,8 @@ func (client *syncClient) syncHoleInterval(holeInterval Interval) error {
 		return fmt.Errorf("sendHole failed, err: %s", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("resp.StatusCode(%d) != http.StatusOK", resp.StatusCode)
+		content, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("resp.StatusCode(%d) != http.StatusOK, resp: %s", resp.StatusCode, content)
 	}
 	resp.Body.Close()
 
@@ -278,7 +280,8 @@ func (client *syncClient) getServerChecksum(checksumInterval Interval) ([]byte, 
 		return nil, fmt.Errorf("getChecksum failed, err: %s", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("resp.StatusCode(%d) != http.StatusOK", resp.StatusCode)
+		content, _ := ioutil.ReadAll(resp.Body)
+		return nil, fmt.Errorf("resp.StatusCode(%d) != http.StatusOK, resp: %s", resp.StatusCode, content)
 	}
 	defer resp.Body.Close()
 
@@ -291,7 +294,8 @@ func (client *syncClient) writeData(dataInterval Interval, data []byte) error {
 		return fmt.Errorf("writeData failed, err: %s", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("resp.StatusCode(%d) != http.StatusOK", resp.StatusCode)
+		content, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("resp.StatusCode(%d) != http.StatusOK, resp: %s", resp.StatusCode, content)
 	}
 	resp.Body.Close()
 
