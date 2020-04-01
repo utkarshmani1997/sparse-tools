@@ -11,7 +11,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/longhorn/sparse-tools/sparse"
+	"github.com/openebs/sparse-tools/sparse"
 )
 
 type SyncFileOperations interface {
