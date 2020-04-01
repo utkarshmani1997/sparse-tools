@@ -1,4 +1,4 @@
-module github.com/longhorn/sparse-tools
+module github.com/openebs/sparse-tools
 
 go 1.13
 

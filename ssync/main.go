@@ -1,6 +1,6 @@
 package main
 
-import "github.com/longhorn/sparse-tools/cli/ssync"
+import "github.com/openebs/sparse-tools/cli/ssync"
 
 func main() {
 	ssync.Main()
