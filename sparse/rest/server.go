@@ -18,7 +18,7 @@ type SyncServer struct {
 
 // TestServer daemon serves only one connection for each test then exits
 func TestServer(port string, filePath string, timeout int) {
-	Server(port, filePath, &SyncFileStub{})
+	Server(port, filePath, &SyncFileProgress{})
 }
 
 func Server(port string, filePath string, syncFileOps SyncFileOperations) error {

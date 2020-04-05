@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/http"
 	"os"
+	"sync"
 
 	log "github.com/sirupsen/logrus"
 
@@ -42,7 +43,9 @@ func Main() {
 		}
 		dstPath := args[0]
 
-		ops := &rest.SyncFileStub{}
+		ops := &rest.SyncFileProgress{
+			RWMutex: sync.RWMutex{},
+		}
 		err := rest.Server(*port, dstPath, ops)
 		if err == http.ErrServerClosed {
 			log.Info("Ssync server: exit code 0")

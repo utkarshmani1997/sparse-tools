@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 
 	log "github.com/sirupsen/logrus"
 
@@ -16,11 +17,56 @@ import (
 
 type SyncFileOperations interface {
 	UpdateSyncFileProgress(size int64)
+	SetFileInfo(size int64, name string)
+	GetProgress() Progress
 }
 
-type SyncFileStub struct{}
+type Progress struct {
+	FileName         string      `json:"filename"`
+	Percent          int         `json:"percent"`
+	AlreadyProcessed json.Number `json:"alreadyprocessed"`
+}
 
-func (f *SyncFileStub) UpdateSyncFileProgress(size int64) {}
+type SyncFileProgress struct {
+	sync.RWMutex
+	fileName        string
+	completePercent int
+	processedData   int64
+	size            int64
+}
+
+func (f *SyncFileProgress) UpdateSyncFileProgress(size int64) {
+	f.Lock()
+	f.processedData = f.processedData + size
+	f.completePercent = int((float32(f.processedData) / float32(f.size)) * 100)
+	f.Unlock()
+}
+
+func (f *SyncFileProgress) SetFileInfo(size int64, name string) {
+	f.Lock()
+	f.size = size
+	f.fileName = name
+	f.Unlock()
+}
+
+func (f *SyncFileProgress) GetProgress() Progress {
+	f.Lock()
+	defer f.Unlock()
+	p := Progress{
+		FileName:         f.fileName,
+		Percent:          f.completePercent,
+		AlreadyProcessed: json.Number(strconv.FormatInt(f.processedData, 10)),
+	}
+	return p
+}
+
+func (server *SyncServer) getProgress(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	progress := server.syncFileOps.GetProgress()
+	if err := json.NewEncoder(writer).Encode(progress); err != nil {
+		log.Errorf("Fail to encode, err: %v", err)
+	}
+}
 
 func (server *SyncServer) getQueryInterval(request *http.Request) (sparse.Interval, error) {
 	var interval sparse.Interval
@@ -107,6 +153,7 @@ func (server *SyncServer) doOpen(request *http.Request) error {
 	if err != nil {
 		return fmt.Errorf("server.getQueryInterval failed, err: %s", err)
 	}
+	server.syncFileOps.SetFileInfo(interval.End, server.filePath)
 
 	// if file size is multiple of 4k, then directIo
 	directIo := (interval.End%sparse.Blocks == 0)
