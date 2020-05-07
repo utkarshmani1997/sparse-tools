@@ -15,8 +15,11 @@ import (
 )
 
 const (
-	httpClientTimeout = 5
-	numBlocksInBatch  = 32
+	numBlocksInBatch = 32
+)
+
+var (
+	HTTPClientTimeout time.Duration = 30
 )
 
 type syncClient struct {
@@ -149,7 +152,7 @@ func (client *syncClient) syncFileContent(file FileIoProcessor, fileSize int64) 
 }
 
 func (client *syncClient) sendRequest(action string, data interface{}) error {
-	httpClient := &http.Client{Timeout: time.Duration(httpClientTimeout * time.Second)}
+	httpClient := &http.Client{Timeout: HTTPClientTimeout}
 
 	b, err := json.Marshal(data)
 	if err != nil {
@@ -175,7 +178,7 @@ func (client *syncClient) sendRequest(action string, data interface{}) error {
 }
 
 func (client *syncClient) sendHTTPRequest(method string, action string, interval Interval, data []byte) (*http.Response, error) {
-	httpClient := &http.Client{Timeout: time.Duration(httpClientTimeout * time.Second)}
+	httpClient := &http.Client{Timeout: HTTPClientTimeout}
 
 	url := fmt.Sprintf("http://%s/v1-ssync/%s", client.remote, action)
 
