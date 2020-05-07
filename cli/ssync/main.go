@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/http"
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -26,9 +27,11 @@ func Main() {
 	daemon := flag.Bool("daemon", false, "daemon mode (run on remote host)")
 	port := flag.String("port", "5000", "optional daemon port")
 	timeout := flag.Int("timeout", 120, "optional daemon/client timeout (seconds)")
+	httpTimeout := flag.Int("httpTimeout", 30, "optional http request timeout (seconds)")
 	host := flag.String("host", "", "remote host of <DstFile> (requires running daemon)")
 
 	flag.Parse()
+	sparse.HTTPClientTimeout = time.Duration(*httpTimeout) * time.Second
 
 	if *verbose {
 		log.SetLevel(log.DebugLevel)
