@@ -29,6 +29,7 @@ func Main() {
 	timeout := flag.Int("timeout", 120, "optional daemon/client timeout (seconds)")
 	httpTimeout := flag.Int("httpTimeout", 30, "optional http request timeout (seconds)")
 	host := flag.String("host", "", "remote host of <DstFile> (requires running daemon)")
+	disableHoleSync := flag.Bool("disableHoleSync", false, "disable syncing holes")
 
 	flag.Parse()
 	sparse.HTTPClientTimeout = time.Duration(*httpTimeout) * time.Second
@@ -60,7 +61,7 @@ func Main() {
 		srcPath := args[0]
 		log.Infof("Syncing %s to %s:%s...\n", srcPath, *host, *port)
 
-		err := sparse.SyncFile(srcPath, *host+":"+*port, *timeout)
+		err := sparse.SyncFile(srcPath, *host+":"+*port, *timeout, *disableHoleSync)
 		if err != nil {
 			log.Fatalf("Ssync client failed, error: %s", err)
 		}

@@ -23,11 +23,12 @@ var (
 )
 
 type syncClient struct {
-	remote   string
-	timeout  int
-	filePath string
-	fileSize int64
-	fileIo   FileIoProcessor
+	remote          string
+	timeout         int
+	filePath        string
+	fileSize        int64
+	fileIo          FileIoProcessor
+	disableHoleSync bool
 }
 
 const connectionRetries = 5
@@ -43,7 +44,7 @@ func unmarshalFile(file string, obj interface{}) error {
 }
 
 // SyncFile synchronizes local file to remote host
-func SyncFile(localPath string, remote string, timeout int) error {
+func SyncFile(localPath, remote string, timeout int, disableHoleSync bool) error {
 	fileInfo, err := os.Stat(localPath)
 	if err != nil {
 		log.Errorf("Failed to get size of source file: %s, err: %s", localPath, err)
@@ -65,7 +66,7 @@ func SyncFile(localPath string, remote string, timeout int) error {
 	}
 	defer fileIo.Close()
 
-	client := &syncClient{remote, timeout, localPath, fileSize, fileIo}
+	client := &syncClient{remote, timeout, localPath, fileSize, fileIo, disableHoleSync}
 
 	// kill the server no matter success or not, best effort
 	defer client.closeServer()
@@ -264,6 +265,9 @@ func (client *syncClient) closeServer() {
 }
 
 func (client *syncClient) syncHoleInterval(holeInterval Interval) error {
+	if client.disableHoleSync {
+		return nil
+	}
 	resp, err := client.sendHTTPRequest("POST", "sendHole", holeInterval, nil)
 	if err != nil {
 		return fmt.Errorf("sendHole failed, err: %s", err)
